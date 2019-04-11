@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+<!--写入title-->
+{% block title %}
+成绩查询
+{% endblock title %}
+
+<!--写入content-->
+{% block content %}
+    <div class="container">
+        {% if message %}
+        {{message}}
+        {% endif %}
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                {{dropbox}}
+                <span class="caret"></span>
+                </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        {% for Term in term_list %}
+                            <li><a href="/search_score/{{Term.term}}">{{Term.term}}</a></li>
+                        {% endfor %}
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/search_score/all">所有学期总览</a></li>
+                    </ul>
+        </div>
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>学号</th>
+                    <th>学期</th>
+                    <th>课程号</th>
+                    <th>教师号</th>
+                    <th>平时成绩</th>
+                    <th>考试成绩</th>
+                    <th>总评成绩</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in student_list %}
+                    <tr>
+                        <td>{{user.s_number_id}}</td>
+                        <td>{{user.term}}</td>
+                        <td>{{user.c_number_id}}</td>
+                        <td>{{user.t_number_id}}</td>
+                        <td>{{user.r_grade}}</td>
+                        <td>{{user.e_grade}}</td>
+                        <td>{{user.t_grade}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
