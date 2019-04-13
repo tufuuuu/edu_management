@@ -27,4 +27,5 @@ urlpatterns = [
     url(r'^logout/', views.logout),
     url(r'^search_score/(.*?)$', views.search_score),
     url(r'^search_course/(.*?)$', views.search_course),
+    url(r'^choose_course/$', views.choose_course),
 ]

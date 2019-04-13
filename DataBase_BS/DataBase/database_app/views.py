@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.core import serializers
+from django.forms.models import model_to_dict
 #from database_app.models import Student_Log_info    #注入学生信息models
 #from database_app.models import Admin_Log_info      #注入管理员信息models
 #from database_app.models import Teacher_Log_info    #注入教师信息models
@@ -160,5 +161,34 @@ def search_course(request, select_term):
 
 #学生选课
 def choose_course(request):
+    # 验证是否登陆
+    if not request.session.get('is_login', None):
+        return redirect('/login/')
+    # 验证是否为学生
+    if request.session.get('user_type') != "student":
+        return redirect('/login/')
 
-    return render()
+    # 得到学生学号
+    student_no = request.session.get('user_id')
+    course_list = Open.objects.all().values()
+
+    if request.method == "POST":
+        select_course_id = request.POST.get("select_button", None)
+        select_course1 = Open.objects.get(id=select_course_id)
+        select_course = model_to_dict(select_course1)
+        Mark.objects.create(s_number_id=student_no, term=select_course['term'], c_number_id=select_course['c_number'], t_number_id=select_course['t_number'], r_grade=0, e_grade=0, t_grade=0)
+
+    student = Mark.objects.filter(s_number=student_no).values()
+    for course in course_list:
+        course['select'] = 0
+        course['c_name'] = Course.objects.filter(number=course['c_number_id']).values('name')[0]['name']
+        course['hour'] = Course.objects.filter(number=course['c_number_id']).values('class_hour')[0]['class_hour']
+        course['credit'] = Course.objects.filter(number=course['c_number_id']).values('credit')[0]['credit']
+        course['t_name'] = Teacher.objects.filter(number=course['t_number_id']).values('name')[0]['name']
+        course['college'] = Course.objects.filter(number=course['c_number_id']).values('college')[0]['college']
+        course['college_name'] = College.objects.filter(number=course['college']).values('name')[0]['name']
+        for student_course in student:
+            if course['c_number_id'] == student_course['c_number_id']:
+                course['select'] = 1
+                break
+    return render(request, 'choose_course.html', {"courst_list": course_list})
