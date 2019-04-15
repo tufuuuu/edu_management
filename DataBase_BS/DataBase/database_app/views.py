@@ -18,8 +18,10 @@ def Index(request):
     if not request.session.get('is_login', None):
         return redirect('/login')
     message = "欢迎：" + request.session.get('user_name')
-    return render(request, 'index.html', {'user':message})
-
+    if request.session.get('user_type') == "student":
+        return render(request, 'index.html', {'user':message})
+    else:
+        return render(request, 't_index.html', {'user':message})
 def getJson(request):
     resp = {'errorcode':100,'detail':'Get success'}
     return HttpResponse(json.dumps(resp), content_type='application/json')
@@ -111,7 +113,7 @@ def search_score(request, select_term):
         return redirect('/login/')
     #验证是否为学生
     if request.session.get('user_type') != "student":
-        return redirect('/login/')
+        return redirect('/logout/')
 
     #得到学生学号
     student_no = request.session.get('user_id')
@@ -138,7 +140,7 @@ def search_course(request, select_term):
         return redirect('/login/')
     # 验证是否为学生
     if request.session.get('user_type') != "student":
-        return redirect('/login/')
+        return redirect('/logout/')
 
     # 得到学生学号
     student_no = request.session.get('user_id')
@@ -166,7 +168,7 @@ def choose_course(request):
         return redirect('/login/')
     # 验证是否为学生
     if request.session.get('user_type') != "student":
-        return redirect('/login/')
+        return redirect('/logout/')
 
     # 得到学生学号
     student_no = request.session.get('user_id')
@@ -192,3 +194,142 @@ def choose_course(request):
                 course['select'] = 1
                 break
     return render(request, 'choose_course.html', {"courst_list": course_list})
+
+#学生退课
+def drop_course(request):
+    # 验证是否登陆
+    if not request.session.get('is_login', None):
+        return redirect('/login/')
+    # 验证是否为学生
+    if request.session.get('user_type') != "student":
+        return redirect('/logout/')
+
+    # 得到学生学号
+    student_no = request.session.get('user_id')
+
+    if request.method == "POST":
+        drop_course_id = request.POST.get("select_button", None)
+        Mark.objects.filter(id=drop_course_id).delete()
+
+    student = Mark.objects.filter(s_number=student_no).values()
+    for course in student:
+        course['c_name'] = Course.objects.filter(number=course['c_number_id']).values('name')[0]['name']
+        course['hour'] = Course.objects.filter(number=course['c_number_id']).values('class_hour')[0]['class_hour']
+        course['credit'] = Course.objects.filter(number=course['c_number_id']).values('credit')[0]['credit']
+        course['t_name'] = Teacher.objects.filter(number=course['t_number_id']).values('name')[0]['name']
+        course['college'] = Course.objects.filter(number=course['c_number_id']).values('college')[0]['college']
+        course['college_name'] = College.objects.filter(number=course['college']).values('name')[0]['name']
+    return render(request, 'drop_course.html', {"courst_list": student})
+
+#教师登陆
+def t_login(request):
+    if request.session.get('is_login', None):
+        return redirect('/index')
+
+    if request.method == "POST":
+        login_form = UserForm(request.POST)
+        message = "请检查填写内容"
+        if login_form.is_valid():    #确保都不为空
+            username = login_form.cleaned_data['username']
+            password = login_form.cleaned_data['password']
+            #其他验证
+            try:
+                user_log = Teacher_Log_info.objects.get(user=username)
+                if user_log.password == password:
+                    request.session['is_login'] = True
+                    request.session['user_id'] = user_log.teacher_no
+                    request.session['user_name'] = user_log.user
+                    request.session['user_type'] = "teacher"
+                    return redirect('/index/')
+                else:
+                    message = "密码不正确"
+            except:
+                message = "用户名不存在"
+        return render(request, 't_login.html', locals())
+
+    login_form = UserForm()
+    return render(request, 't_login.html', locals())
+
+#教师开课查询
+def t_course(request):
+    # 验证是否登陆
+    if not request.session.get('is_login', None):
+        return redirect('/login/')
+    # 验证是否为教师
+    if request.session.get('user_type') != "teacher":
+        return render('/logout/')
+
+    # 得到教师号
+    teacher_no = request.session.get('user_id')
+    # 将学期列表准备好
+    #term_list = Term.objects.all()
+
+    # 寻找学期
+    #term = Term.objects.filter(term=select_term)
+    teacher = Open.objects.filter(t_number=teacher_no).values()
+    t_name = Teacher.objects.filter(number=teacher_no).values('name')[0]['name']
+    return render(request, 't_course.html', {'t_course': teacher, "t_name": t_name})
+
+#相关课程详细信息
+def t_course_detal(request, select_term, select_c_number, select_time):
+    # 验证是否登陆
+    if not request.session.get('is_login', None):
+        return redirect('/login/')
+    # 验证是否为教师
+    if request.session.get('user_type') != "teacher":
+        return render('/logout/')
+
+    # 得到教师号
+    teacher_no = request.session.get('user_id')
+    # 将学期列表准备好
+    #term_list = Term.objects.all()
+
+    # 寻找学期
+    #if select_term:
+        #term = Term.objects.filter(term=select_term)
+        #if term:  # 如果所选学期在学期表内，则寻找这个学生在这个学期内的成绩
+    teacher_list = Mark.objects.filter(t_number=teacher_no, term=select_term, c_number=select_c_number).values()
+    teacher = Open.objects.get(t_number=teacher_no, c_number=select_c_number, term=select_term, time=select_time)
+    #teacher = model_to_dict(teacher)
+    t_name = Teacher.objects.filter(number=teacher_no).values('name')[0]['name']
+    return render(request, "t_course_detal.html", {"teacher_list": teacher_list, "t_course": teacher, "t_name": t_name})
+        #message = "请选择正确的学期"  # GET方式，防止有人随便在url中加入奇怪的字符
+
+#教师打分
+def t_course_mark(request, select_term, select_c_number, select_time):
+    # 验证是否登陆
+    if not request.session.get('is_login', None):
+        return redirect('/login/')
+    # 验证是否为教师
+    if request.session.get('user_type') != "teacher":
+        return render('/logout/')
+
+    # 得到教师号
+    teacher_no = request.session.get('user_id')
+    if request.method == "POST":
+        student_no = request.POST.get('student_no')
+        student_r_grade = int(request.POST.get(student_no+'r_grade'))
+        student_e_grade = int(request.POST.get(student_no+'e_grade'))
+        if student_r_grade > 100 or student_r_grade < 0:
+            message = "平时成绩输入有误"
+            return render(request, "t_course_mark.html", {"message": message})
+        if student_e_grade > 100 or student_e_grade < 0:
+            message = "考试成绩输入有误"
+            return render(request, "t_course_mark.html", {"message": message})
+        percent = 0.5    #平时成绩占比
+        student_t_grade = percent * student_r_grade + (1 - percent) * student_e_grade
+        Mark.objects.filter(s_number=student_no, term=select_term, c_number=select_c_number, t_number=teacher_no).update(r_grade=student_r_grade, e_grade=student_e_grade, t_grade=student_t_grade)
+
+     # 将学期列表准备好
+    # term_list = Term.objects.all()
+
+    # 寻找学期
+    # if select_term:
+    # term = Term.objects.filter(term=select_term)
+    # if term:  # 如果所选学期在学期表内，则寻找这个学生在这个学期内的成绩
+    teacher_list = Mark.objects.filter(t_number=teacher_no, term=select_term, c_number=select_c_number).values()
+    teacher = Open.objects.get(t_number=teacher_no, c_number=select_c_number, term=select_term, time=select_time)
+    # teacher = model_to_dict(teacher)
+    t_name = Teacher.objects.filter(number=teacher_no).values('name')[0]['name']
+    return render(request, "t_course_mark.html", {"teacher_list": teacher_list, "t_course": teacher, "t_name": t_name})
+    # message = "请选择正确的学期"  # GET方式，防止有人随便在url中加入奇怪的字符

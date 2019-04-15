@@ -4,18 +4,18 @@
             <a class="navbar-brand" href="/index">教务管理系统</a>
         </div>
         <div class="nav navbar-nav">
-            <li><a href="/search_course">课程查询</a></li>
-            <li><a href="/search_score">成绩查询</a></li>
-            <li class="dropdown">
+            <li><a href="/t_course/">课程管理</a></li>
+            <!--<li><a href="/#">学生成绩查询</a></li>-->
+            <!--<li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                   课程管理
                   <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="/choose_course">选课</a></li>
-                <li><a href="/drop_course">退课</a></li>
+                <li><a href="/#">选课</a></li>
+                <li><a href="/#">退课</a></li>
               </ul>
-            </li>
+            </li>-->
         </div>
         <form class="nav navbar-form navbar-right" action="/logout/" method="POST">
             {% csrf_token %}

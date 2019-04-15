@@ -1,0 +1,29 @@
+{% extends 'base_teacher.html' %}
+{% load staticfiles %}
+
+<!--写入title-->
+{% block title %}
+首页
+{% endblock title %}
+
+<!--写入content-->
+{% block content %}
+
+<script>
+    setInterval("clock.innerHTML=new Date().toLocaleString()",10)
+</script>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            {{user}}
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+    <div class="text-align:center">
+        <span id="clock"></span>
+    </div>
+</div>
+
+{% endblock content %}

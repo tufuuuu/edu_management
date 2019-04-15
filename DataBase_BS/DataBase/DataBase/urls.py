@@ -28,4 +28,9 @@ urlpatterns = [
     url(r'^search_score/(.*?)$', views.search_score),
     url(r'^search_course/(.*?)$', views.search_course),
     url(r'^choose_course/$', views.choose_course),
+    url(r'^drop_course/$', views.drop_course),
+    url(r'^t_login/$', views.t_login),
+    url(r'^t_course/$', views.t_course),
+    url(r'^t_course_detal/(.*?)/(.*?)/(.*?)$', views.t_course_detal),
+    url(r'^t_course_mark/(.*?)/(.*?)/(.*?)$', views.t_course_mark),
 ]

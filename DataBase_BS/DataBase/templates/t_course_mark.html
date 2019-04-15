@@ -1,0 +1,48 @@
+{% extends 'base_teacher.html' %}
+{% load staticfiles %}
+
+<!--写入title-->
+{% block title %}
+课程查询
+{% endblock title %}
+
+<!--写入content-->
+{% block content %}
+    <div class="container">
+        {% if message %}
+        {{message}}
+        {% endif %}
+        <div>
+            <div>教师姓名： {{t_name}}</div>
+            <div>课程学期： {{t_course.term}}</div>
+            <div>课程号： {{t_course.c_number_id}}</div>
+            <div>上课时间： {{t_course.time}}</div>
+        </div>
+
+        <form class="form-group" method="POST" action="/t_course_mark/{{t_course.term}}/{{t_course.c_number_id}}/{{t_course.time}}">        
+            {% csrf_token %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>学生</th>
+                        <th>平时成绩</th>
+                        <th>考试成绩</th>
+                        <th>总评成绩</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in teacher_list %}
+                        <tr>
+                            <td>{{student.s_number_id}}</td>
+                            <td><input class="form-control" name="{{student.s_number_id}}r_grade" value={{student.r_grade}}></td>
+                            <td><input class="form-control" name="{{student.s_number_id}}e_grade" value={{student.e_grade}}></td>
+                            <td>{{student.t_grade}}</td>
+                            <td><button type="submit" name="student_no" value={{student.s_number_id}}>确定</button></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+{% endblock content %}
