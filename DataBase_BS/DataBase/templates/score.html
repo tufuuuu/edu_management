@@ -36,6 +36,7 @@
                     <th>平时成绩</th>
                     <th>考试成绩</th>
                     <th>总评成绩</th>
+                    <th>绩点</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,9 +49,14 @@
                         <td>{{user.r_grade}}</td>
                         <td>{{user.e_grade}}</td>
                         <td>{{user.t_grade}}</td>
+                        <td>{{user.gpa}}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+        
+        <div>
+            {{gpa}}
+        </div>
     </div>
 {% endblock content %}

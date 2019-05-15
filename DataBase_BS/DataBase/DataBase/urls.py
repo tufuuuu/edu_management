@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^login/', views.login),
     url(r'^register/', views.register),
     url(r'^logout/', views.logout),
+    url(r'^change_password/', views.change_password),
     url(r'^search_score/(.*?)$', views.search_score),
     url(r'^search_course/(.*?)$', views.search_course),
     url(r'^choose_course/$', views.choose_course),

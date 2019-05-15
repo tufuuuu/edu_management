@@ -24,6 +24,9 @@
                     <th>教师姓名</th>
                     <th>时长</th>
                     <th>学院</th>
+                    <th>学分</th>
+                    <th>已选人数</th>
+                    <th>容量</th>
                     <th></th>
                 </tr>
             </thead>
@@ -38,12 +41,16 @@
                             <td>{{course.t_name}}</td>
                             <td>{{course.hour}}</td>
                             <td>{{course.college_name}}</td>
+                            <td>{{course.credit}}</td>
+                            <td>{{course.al_sel}}</td>
+                            <td>{{course.volume}}</td>
                             <td><button type="submit" name=select_button value={{course.id}}>选课</button></td>
                         </tr>                        
                     {% endifequal %}
                 {% endfor %}
             </tbody>
         </table>
+        <div>已选学分:{{credit}}</div>
     </form>
     </div>
 {% endblock content %}

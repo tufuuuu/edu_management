@@ -30,6 +30,7 @@
                     <th>学期</th>
                     <th>课程号</th>
                     <th>教师号</th>
+                    <th>教师名</th>
                     <th>上课时间</th>
                 </tr>
             </thead>
@@ -39,10 +40,48 @@
                         <td>{{user.term}}</td>
                         <td>{{user.c_number_id}}</td>
                         <td>{{user.t_number_id}}</td>
+                        <td>{{user.t_name}}</td>
                         <td>{{user.time}}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <div class="row">
+            
+        <div class="col-md-4">
+
+
+
+        </div>
+        
+        <div class="col-md-8 pull-right">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>周一</th>
+                    <th>周二</th>
+                    <th>周三</th>
+                    <th>周四</th>
+                    <th>周五</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in lesson %}
+                    <tr>
+                        <td width="10px">{{i.id}}</td>
+                        <td width="50px">{{i.星期一}}</td>
+                        <td width="50px">{{i.星期二}}</td>
+                        <td width="50px">{{i.星期三}}</td>
+                        <td width="50px">{{i.星期四}}</td>
+                        <td width="50px">{{i.星期五}}</td>
+                    </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    </div>
+    </div>
     </div>
 {% endblock content %}
